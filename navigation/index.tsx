@@ -68,10 +68,6 @@ function RootNavigator() {
   );
 }
 
-/**
- * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
- * https://reactnavigation.org/docs/bottom-tab-navigator
- */
 const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
 function BottomTabNavigator() {
@@ -81,7 +77,22 @@ function BottomTabNavigator() {
     <BottomTab.Navigator
       initialRouteName="TabOne"
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
+        tabBarStyle: {
+          borderRadius: 20,
+          alignItems: "center",
+          justifyContent: "center",
+          position: "absolute",
+          bottom: 10,
+          alignContent: "center",
+          backgroundColor: "#1A1A40",
+          borderColor: "#270082",
+          borderTopColor: "#270082",
+          borderWidth: 1,
+          borderTopWidth: 1,
+          width: "90%",
+          left: "5%",
+        },
+        tabBarActiveTintColor: "#7A0BC0",
       }}
     >
       <BottomTab.Screen
@@ -90,6 +101,12 @@ function BottomTabNavigator() {
         options={({ navigation }: RootTabScreenProps<"TabOne">) => ({
           title: "",
           headerShown: false,
+          tabBarItemStyle: {
+            borderRadius: 20,
+            alignItems: "center",
+            justifyContent: "center",
+          },
+
           tabBarIcon: ({ color }) => <TabBarIcon name="child" color={color} />,
           // headerRight: () => (
           //   <Pressable
@@ -111,8 +128,8 @@ function BottomTabNavigator() {
         name="TabTwo"
         component={TabTwoScreen}
         options={{
-          title: "Tab Two",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: "",
+          tabBarIcon: ({ color }) => <TabBarIcon name="globe" color={color} />,
         }}
       />
     </BottomTab.Navigator>
@@ -126,5 +143,5 @@ function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
 }) {
-  return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome size={30} style={{ marginBottom: -10 }} {...props} />;
 }

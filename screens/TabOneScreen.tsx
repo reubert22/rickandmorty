@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, FlatList, Image } from "react-native";
+import {
+  StyleSheet,
+  FlatList,
+  Image,
+  TextInput,
+  Pressable,
+} from "react-native";
 
 import { Text, View } from "../components/Themed";
 import { RootTabScreenProps } from "../types";
@@ -11,12 +17,22 @@ export default function TabOneScreen({
   navigation,
 }: RootTabScreenProps<"TabOne">) {
   const [characters, setAllCharacters] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [selected, setSelected] = useState("");
+
   useEffect(() => {
     axios
       .get("https://rickandmortyapi.com/api/character")
       .then((response) => {
-        console.log("response", response);
         setAllCharacters(response.data.results);
+      })
+      .catch((e) => {
+        console.log("e", e);
+      });
+    axios
+      .get("https://rickandmortyapi.com/api/location")
+      .then((response) => {
+        setLocations(response.data.results);
       })
       .catch((e) => {
         console.log("e", e);
@@ -41,7 +57,8 @@ export default function TabOneScreen({
             lightColor="#eee"
             darkColor="rgba(255,255,255,0.1)"
           >
-            <FontAwesome name="child" size={15} color="white" />
+            <FontAwesome name="child" size={15} color="#7A0BC0" />
+
             <Text style={styles.eyebrowTitle}>Characters</Text>
           </View>
           <View
@@ -57,7 +74,9 @@ export default function TabOneScreen({
           style={styles.profilePicture}
           lightColor="#eee"
           darkColor="rgba(255,255,255,0.1)"
-        />
+        >
+          <FontAwesome name="user" size={20} color="white" />
+        </View>
         {/* https://rickandmortyapi.com/api/character/avatar/19.jpeg */}
       </View>
       <View
@@ -65,17 +84,27 @@ export default function TabOneScreen({
         lightColor="#eee"
         darkColor="rgba(255,255,255,0.1)"
       >
-        <View
+        {/* <View
           style={styles.input}
           lightColor="#eee"
           darkColor="rgba(255,255,255,0.1)"
-        />
+        /> */}
+        <TextInput
+          style={styles.input}
+          onChangeText={() => {}}
+          value={""}
+          placeholder="Search Characters"
+          keyboardType="web-search"
+          placeholderTextColor="rgba(206, 206, 206, 0.7)"
+        >
+          {/* <FontAwesome name="search" size={20} color="white" /> */}
+        </TextInput>
         <View
           style={styles.filters}
           lightColor="#eee"
           darkColor="rgba(255,255,255,0.1)"
         >
-          <FontAwesome name="sliders" size={40} color="white" />
+          <FontAwesome name="sliders" size={30} color="white" />
         </View>
       </View>
       <View
@@ -84,27 +113,31 @@ export default function TabOneScreen({
         darkColor="rgba(255,255,255,0.1)"
       >
         <FlatList
-          data={[
-            {
-              id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-              title: "First ",
-            },
-            {
-              id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-              title: "Second ",
-            },
-            {
-              id: "58694a0f-3da1-471f-bd96-145571e29d72",
-              title: "Third ",
-            },
-          ]}
+          data={locations}
           renderItem={({ item }) => (
             <View
               style={styles.menuList}
               lightColor="#eee"
               darkColor="rgba(255,255,255,0.1)"
             >
-              <Text style={styles.title}>{item.title}</Text>
+              <Pressable
+                onPress={() => {
+                  setSelected(item.name === selected ? "" : item.name);
+                }}
+                style={({ pressed }) => ({
+                  opacity: pressed ? 0.5 : 1,
+                })}
+              >
+                <Text
+                  numberOfLines={2}
+                  style={[
+                    styles.title,
+                    item.name === selected ? styles.titleSelected : {},
+                  ]}
+                >
+                  {item.name}
+                </Text>
+              </Pressable>
             </View>
           )}
           keyExtractor={(item) => item.id}
@@ -140,7 +173,10 @@ export default function TabOneScreen({
                 <Image style={styles.img} source={{ uri: item.image || "" }} />
               </View>
               <View
-                style={styles.description}
+                style={{
+                  ...styles.description,
+                  borderColor: item.gender === "Female" ? "#FA58B6" : "#270082",
+                }}
                 lightColor="#eee"
                 darkColor="rgba(255,255,255,0.1)"
               >
@@ -173,7 +209,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "flex-start",
     justifyContent: "flex-start",
-    backgroundColor: "rgba(26, 39, 73, 0.95)",
+    backgroundColor: "#1A1A40",
     padding: 10,
   },
   header: {
@@ -184,6 +220,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingTop: 30,
+    marginBottom: 10,
   },
   greetings: {
     backgroundColor: "transparent",
@@ -209,13 +246,16 @@ const styles = StyleSheet.create({
     color: "white",
   },
   profilePicture: {
-    backgroundColor: "rgba(26, 39, 73, 0.5)",
+    backgroundColor: "#1A1A40",
+    borderColor: "#7A0BC0",
+    borderWidth: 1,
     height: 50,
     width: 50,
     borderRadius: 25,
     padding: 15,
     marginRight: 5,
     marginTop: 10,
+    alignItems: "center",
   },
   search: {
     backgroundColor: "transparent",
@@ -227,18 +267,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   input: {
-    backgroundColor: "rgba(26, 39, 73, 0.5)",
+    backgroundColor: "#1A1A40",
+    borderColor: "#7A0BC0",
+    borderWidth: 1,
     height: "80%",
-    width: "70%",
+    width: "80%",
     padding: 5,
     borderRadius: 20,
+    paddingHorizontal: 20,
+    color: "white",
   },
   filters: {
-    backgroundColor: "#536EFA",
+    backgroundColor: "#1A1A40",
+    borderColor: "#7A0BC0",
+    borderWidth: 1,
     height: "80%",
-    width: "17%",
+    width: "15%",
     padding: 5,
-    borderRadius: 20,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -276,7 +322,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 15,
-    backgroundColor: "rgba(26, 39, 73, 1)",
+    backgroundColor: "#1A1A40",
     height: 50,
     width: 50,
     padding: 5,
@@ -286,8 +332,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   containerImg: {
-    width: 250,
-    backgroundColor: "rgba(26, 39, 73, 0.5)",
+    width: 240,
+    backgroundColor: "transparent",
     height: "90%",
     borderRadius: 50,
   },
@@ -300,12 +346,16 @@ const styles = StyleSheet.create({
   description: {
     height: "30%",
     width: "90%",
-    backgroundColor: "rgba(26, 39, 73, 1)",
+    backgroundColor: "#1A1A40",
     position: "absolute",
     bottom: 0,
     borderRadius: 30,
     paddingHorizontal: 20,
     paddingVertical: 10,
+    borderWidth: 2,
+    // borderColor: "#270082",
+    borderBottomWidth: 0,
+    borderTopWidth: 1,
   },
   name: {
     fontSize: 14,
@@ -330,9 +380,18 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   title: {
-    fontSize: 20,
+    fontSize: 12,
     color: "white",
-    borderRadius: 10,
+    textAlign: "center",
+    margin: 2,
+  },
+  titleSelected: {
+    borderBottomWidth: 2,
+    borderColor: "#7A0BC0",
+    borderBottomRightRadius: 200,
+    borderBottomLeftRadius: 200,
+    borderEndWidth: 1,
+    borderEndColor: "green",
   },
   separator: {
     marginVertical: 30,
