@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   FlatList,
@@ -6,19 +6,23 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-
-import { Text, View } from "../components/Themed";
-import { RootTabScreenProps } from "../types";
-import { useEffect } from "react";
-import axios from "axios";
 import { FontAwesome } from "@expo/vector-icons";
+import axios from "axios";
 
-export default function TabOneScreen({
+import { RootTabScreenProps } from "../types";
+import { Text, View } from "../components/Themed";
+import Colors from "../constants/Colors";
+import { CharactersType } from "../types/Characters";
+import { LocationsType } from "../types/Locations";
+import Fonts from "../constants/Fonts";
+
+export default function CharactersScreen({
   navigation,
-}: RootTabScreenProps<"TabOne">) {
-  const [characters, setAllCharacters] = useState([]);
-  const [locations, setLocations] = useState([]);
-  const [selected, setSelected] = useState("");
+}: RootTabScreenProps<"CharactersTab">) {
+  const [characters, setAllCharacters] = useState<CharactersType[]>([]);
+  const [locations, setLocations] = useState<LocationsType[]>([]);
+  const [selected, setSelected] = useState<number>(0);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     axios
@@ -41,88 +45,48 @@ export default function TabOneScreen({
 
   return (
     <View style={styles.container}>
-      {/*  */}
-      <View
-        style={styles.header}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      >
-        <View
-          style={styles.greetings}
-          lightColor="#eee"
-          darkColor="rgba(255,255,255,0.1)"
-        >
-          <View
-            style={styles.eyebrow}
-            lightColor="#eee"
-            darkColor="rgba(255,255,255,0.1)"
-          >
-            <FontAwesome name="child" size={15} color="#7A0BC0" />
-
+      <View style={styles.header}>
+        <View style={styles.greetings}>
+          <View style={styles.eyebrow}>
+            <FontAwesome
+              name="child"
+              size={15}
+              color={Colors.paletteOne.purple}
+            />
             <Text style={styles.eyebrowTitle}>Characters</Text>
           </View>
-          <View
-            style={styles.seeAllContainer}
-            lightColor="#eee"
-            darkColor="rgba(255,255,255,0.1)"
-          >
+          <View style={styles.seeAllContainer}>
             <Text style={styles.see}>See,</Text>
             <Text style={styles.all}>All here!</Text>
           </View>
         </View>
-        <View
-          style={styles.profilePicture}
-          lightColor="#eee"
-          darkColor="rgba(255,255,255,0.1)"
-        >
+        <View style={styles.profilePicture}>
           <FontAwesome name="user" size={20} color="white" />
         </View>
-        {/* https://rickandmortyapi.com/api/character/avatar/19.jpeg */}
       </View>
-      <View
-        style={styles.search}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      >
-        {/* <View
-          style={styles.input}
-          lightColor="#eee"
-          darkColor="rgba(255,255,255,0.1)"
-        /> */}
+
+      <View style={styles.search}>
         <TextInput
           style={styles.input}
           onChangeText={() => {}}
           value={""}
           placeholder="Search Characters"
           keyboardType="web-search"
-          placeholderTextColor="rgba(206, 206, 206, 0.7)"
-        >
-          {/* <FontAwesome name="search" size={20} color="white" /> */}
-        </TextInput>
-        <View
-          style={styles.filters}
-          lightColor="#eee"
-          darkColor="rgba(255,255,255,0.1)"
-        >
+          placeholderTextColor={Colors.whiteOpacity}
+        />
+        <View style={styles.filters}>
           <FontAwesome name="sliders" size={30} color="white" />
         </View>
       </View>
-      <View
-        style={styles.menu}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      >
+
+      <View style={styles.menu}>
         <FlatList
           data={locations}
           renderItem={({ item }) => (
-            <View
-              style={styles.menuList}
-              lightColor="#eee"
-              darkColor="rgba(255,255,255,0.1)"
-            >
+            <View style={styles.menuList}>
               <Pressable
                 onPress={() => {
-                  setSelected(item.name === selected ? "" : item.name);
+                  setSelected(item.id === selected ? 0 : item.id);
                 }}
                 style={({ pressed }) => ({
                   opacity: pressed ? 0.5 : 1,
@@ -132,7 +96,7 @@ export default function TabOneScreen({
                   numberOfLines={2}
                   style={[
                     styles.title,
-                    item.name === selected ? styles.titleSelected : {},
+                    item.id === selected ? styles.titleSelected : {},
                   ]}
                 >
                   {item.name}
@@ -140,66 +104,75 @@ export default function TabOneScreen({
               </Pressable>
             </View>
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           horizontal
           showsHorizontalScrollIndicator={false}
         />
       </View>
-      <View
-        style={styles.list}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      >
+
+      <View style={styles.containerCharacters}>
         <FlatList
           data={characters}
           renderItem={({ item }) => (
-            <View
-              style={styles.listItems}
-              lightColor="#eee"
-              darkColor="rgba(255,255,255,0.1)"
-            >
-              <View
-                style={styles.bookmark}
-                lightColor="#eee"
-                darkColor="rgba(255,255,255,0.1)"
+            <View style={styles.listItems}>
+              <Pressable
+                onPress={() => setSaved(!saved)}
+                style={{
+                  ...styles.bookmark,
+                  opacity: saved ? 1 : 0.7,
+                }}
               >
-                <FontAwesome name="bookmark" size={25} color="white" />
+                <FontAwesome
+                  name={saved ? "bookmark" : "bookmark-o"}
+                  size={20}
+                  color="white"
+                />
+              </Pressable>
+              <View style={styles.containerStatus}>
+                <Text
+                  style={{
+                    ...styles.status,
+                    color: item.status === "Alive" ? "green" : "red",
+                  }}
+                >
+                  {item.status}
+                </Text>
               </View>
-              <View
-                style={styles.containerImg}
-                lightColor="#eee"
-                darkColor="rgba(255,255,255,0.1)"
-              >
+              <View style={styles.containerImg}>
                 <Image style={styles.img} source={{ uri: item.image || "" }} />
               </View>
               <View
                 style={{
                   ...styles.description,
-                  borderColor: item.gender === "Female" ? "#FA58B6" : "#270082",
+                  borderColor:
+                    item.gender === "Female"
+                      ? Colors.paletteOne.pink
+                      : Colors.paletteOne.lightNavy,
                 }}
-                lightColor="#eee"
-                darkColor="rgba(255,255,255,0.1)"
               >
                 <Text numberOfLines={1} style={styles.name}>
                   {item.name}
                 </Text>
-                <View
-                  style={styles.containerSpecieGender}
-                  lightColor="#eee"
-                  darkColor="rgba(255,255,255,0.1)"
-                >
+                <View style={styles.containerSpeciesGender}>
                   <Text style={styles.species}>{item.species}, </Text>
                   <Text style={styles.gender}>{item.gender}</Text>
+                </View>
+                <View style={styles.containerLocation}>
+                  <Text numberOfLines={1} style={styles.location}>
+                    From: {item.origin.name}
+                  </Text>
+                  <Text numberOfLines={1} style={styles.location}>
+                    Location: {item.location.name}
+                  </Text>
                 </View>
               </View>
             </View>
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           horizontal
           showsHorizontalScrollIndicator={false}
         />
       </View>
-      {/* <EditScreenInfo path="/screens/TabOneScreen.tsx" /> */}
     </View>
   );
 }
@@ -209,11 +182,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "flex-start",
     justifyContent: "flex-start",
-    backgroundColor: "#1A1A40",
+    backgroundColor: Colors.paletteOne.navy,
     padding: 10,
   },
   header: {
-    backgroundColor: "transparent",
+    backgroundColor: Colors.transparent,
     height: "25%",
     width: "100%",
     padding: 5,
@@ -223,42 +196,45 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   greetings: {
-    backgroundColor: "transparent",
+    backgroundColor: Colors.transparent,
     height: "100%",
     width: "50%",
-    padding: 15,
+    paddingTop: 15,
     borderRadius: 5,
   },
   eyebrow: {
-    backgroundColor: "transparent",
+    backgroundColor: Colors.transparent,
     flexDirection: "row",
     marginBottom: 10,
   },
   seeAllContainer: {
-    backgroundColor: "transparent",
+    backgroundColor: Colors.transparent,
   },
   see: {
     fontSize: 32,
     color: "#cecece",
+    fontFamily: Fonts.shadowsInto,
+    letterSpacing: 1,
   },
   all: {
     fontSize: 32,
-    color: "white",
+    color: Colors.white,
+    fontFamily: Fonts.permanentMarker,
+    letterSpacing: 2,
   },
   profilePicture: {
-    backgroundColor: "#1A1A40",
-    borderColor: "#7A0BC0",
+    backgroundColor: Colors.paletteOne.navy,
+    borderColor: Colors.paletteOne.purple,
     borderWidth: 1,
     height: 50,
     width: 50,
     borderRadius: 25,
     padding: 15,
-    marginRight: 5,
     marginTop: 10,
     alignItems: "center",
   },
   search: {
-    backgroundColor: "transparent",
+    backgroundColor: Colors.transparent,
     height: "10%",
     width: "100%",
     padding: 5,
@@ -267,19 +243,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   input: {
-    backgroundColor: "#1A1A40",
-    borderColor: "#7A0BC0",
+    backgroundColor: Colors.paletteOne.navy,
+    borderColor: Colors.paletteOne.purple,
     borderWidth: 1,
     height: "80%",
     width: "80%",
     padding: 5,
     borderRadius: 20,
     paddingHorizontal: 20,
-    color: "white",
+    color: Colors.white,
+    fontFamily: Fonts.robotoLight,
   },
   filters: {
-    backgroundColor: "#1A1A40",
-    borderColor: "#7A0BC0",
+    backgroundColor: Colors.paletteOne.navy,
+    borderColor: Colors.paletteOne.purple,
     borderWidth: 1,
     height: "80%",
     width: "15%",
@@ -289,22 +266,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   menu: {
-    backgroundColor: "transparent",
+    backgroundColor: Colors.transparent,
     height: "10%",
     width: "100%",
     padding: 5,
     paddingRight: 0,
   },
   menuList: {
-    backgroundColor: "transparent",
+    backgroundColor: Colors.transparent,
     height: "100%",
     width: 100,
     marginRight: 5,
     alignItems: "center",
     justifyContent: "center",
   },
-  list: {
-    backgroundColor: "transparent",
+  containerCharacters: {
+    backgroundColor: Colors.transparent,
     height: "55%",
     width: "100%",
     padding: 5,
@@ -312,7 +289,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   listItems: {
-    backgroundColor: "transparent",
+    backgroundColor: Colors.transparent,
     marginRight: 20,
     height: "80%",
     position: "relative",
@@ -322,18 +299,33 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 15,
-    backgroundColor: "#1A1A40",
-    height: 50,
-    width: 50,
+    backgroundColor: Colors.paletteOne.navy,
+    height: 40,
+    width: 40,
     padding: 5,
     borderRadius: 10,
     zIndex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
+  containerStatus: {
+    position: "absolute",
+    top: 5,
+    left: 10,
+    backgroundColor: Colors.transparent,
+    padding: 5,
+    borderRadius: 10,
+    zIndex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  status: {
+    fontSize: 14,
+    fontFamily: Fonts.spaceMono,
+  },
   containerImg: {
     width: 240,
-    backgroundColor: "transparent",
+    backgroundColor: Colors.transparent,
     height: "90%",
     borderRadius: 50,
   },
@@ -346,52 +338,70 @@ const styles = StyleSheet.create({
   description: {
     height: "30%",
     width: "90%",
-    backgroundColor: "#1A1A40",
+    backgroundColor: Colors.paletteOne.navy,
     position: "absolute",
-    bottom: 0,
+    justifyContent: "center",
+    bottom: -5,
     borderRadius: 30,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderWidth: 2,
-    // borderColor: "#270082",
+    paddingTop: 3,
+    borderWidth: 1,
     borderBottomWidth: 0,
-    borderTopWidth: 1,
+    borderTopWidth: 0,
   },
   name: {
-    fontSize: 14,
-    color: "white",
+    fontSize: 16,
+    color: Colors.white,
+    fontFamily: Fonts.robotoLight,
+    fontWeight: "bold",
   },
-  containerSpecieGender: {
-    backgroundColor: "transparent",
+  containerSpeciesGender: {
+    backgroundColor: Colors.transparent,
     flexDirection: "row",
     alignItems: "center",
   },
   gender: {
     fontSize: 14,
-    color: "rgba(206, 206, 206, 0.7)",
+    color: Colors.whiteOpacity,
+    fontFamily: Fonts.robotoLight,
   },
   species: {
     fontSize: 14,
-    color: "rgba(206, 206, 206, 0.7)",
+    color: Colors.whiteOpacity,
+    fontFamily: Fonts.robotoLight,
+  },
+  containerLocation: {
+    marginTop: 5,
+    backgroundColor: Colors.transparent,
+  },
+  location: {
+    fontSize: 12,
+    color: Colors.whiteOpacity,
+    fontFamily: Fonts.robotoLight,
   },
   eyebrowTitle: {
     fontSize: 14,
-    color: "rgba(206, 206, 206, 0.7)",
+    color: Colors.whiteOpacity,
     marginLeft: 10,
+    fontFamily: Fonts.shadowsInto,
+    letterSpacing: 1,
+    lineHeight: 20,
   },
   title: {
     fontSize: 12,
-    color: "white",
+    color: Colors.white,
     textAlign: "center",
     margin: 2,
+    fontFamily: Fonts.robotoLight,
+    letterSpacing: 0.5,
   },
   titleSelected: {
     borderBottomWidth: 2,
-    borderColor: "#7A0BC0",
+    borderColor: Colors.paletteOne.purple,
     borderBottomRightRadius: 200,
     borderBottomLeftRadius: 200,
     borderEndWidth: 1,
-    borderEndColor: "green",
   },
   separator: {
     marginVertical: 30,
@@ -399,4 +409,3 @@ const styles = StyleSheet.create({
     width: "80%",
   },
 });
-// #1a2749

@@ -18,7 +18,7 @@ import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import ModalScreen from "../screens/ModalScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
-import TabOneScreen from "../screens/TabOneScreen";
+import CharactersScreen from "../screens/CharactersScreen";
 import TabTwoScreen from "../screens/TabTwoScreen";
 import {
   RootStackParamList,
@@ -75,30 +75,34 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="TabOne"
+      initialRouteName="CharactersTab"
       screenOptions={{
         tabBarStyle: {
           borderRadius: 20,
           alignItems: "center",
           justifyContent: "center",
           position: "absolute",
-          bottom: 10,
+          bottom: -1,
           alignContent: "center",
-          backgroundColor: "#1A1A40",
-          borderColor: "#270082",
-          borderTopColor: "#270082",
+          backgroundColor: Colors.paletteOne.navy,
+          borderColor: Colors.paletteOne.lightNavy,
+          borderTopColor: Colors.paletteOne.lightNavy,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,
+          borderTopLeftRadius: 100,
+          borderTopRightRadius: 100,
           borderWidth: 1,
           borderTopWidth: 1,
-          width: "90%",
-          left: "5%",
+          width: "95%",
+          left: "2.5%",
         },
-        tabBarActiveTintColor: "#7A0BC0",
+        tabBarActiveTintColor: Colors.paletteOne.purple,
       }}
     >
       <BottomTab.Screen
-        name="TabOne"
-        component={TabOneScreen}
-        options={({ navigation }: RootTabScreenProps<"TabOne">) => ({
+        name="CharactersTab"
+        component={CharactersScreen}
+        options={({ navigation }: RootTabScreenProps<"CharactersTab">) => ({
           title: "",
           headerShown: false,
           tabBarItemStyle: {
