@@ -7,40 +7,31 @@ import {
   Pressable,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import axios from "axios";
 
 import { RootTabScreenProps } from "../types";
 import { Text, View } from "../components/Themed";
 import Colors from "../constants/Colors";
-import { CharactersType } from "../types/Characters";
-import { LocationsType } from "../types/Locations";
 import Fonts from "../constants/Fonts";
+import { useGetCharacters } from "../hooks/useGetCharacters";
+import { useGetLocation } from "../hooks/useGetLocation";
 
 export default function CharactersScreen({
   navigation,
 }: RootTabScreenProps<"CharactersTab">) {
-  const [characters, setAllCharacters] = useState<CharactersType[]>([]);
-  const [locations, setLocations] = useState<LocationsType[]>([]);
   const [selected, setSelected] = useState<number>(0);
   const [saved, setSaved] = useState(false);
+  const { characters, fetchCharacters } = useGetCharacters();
+  const { locations, fetchLocation } = useGetLocation();
+
+  const getCharacters = () =>
+    fetchCharacters("https://rickandmortyapi.com/api/character");
+
+  const getLocations = () =>
+    fetchLocation("https://rickandmortyapi.com/api/location");
 
   useEffect(() => {
-    axios
-      .get("https://rickandmortyapi.com/api/character")
-      .then((response) => {
-        setAllCharacters(response.data.results);
-      })
-      .catch((e) => {
-        console.log("e", e);
-      });
-    axios
-      .get("https://rickandmortyapi.com/api/location")
-      .then((response) => {
-        setLocations(response.data.results);
-      })
-      .catch((e) => {
-        console.log("e", e);
-      });
+    getCharacters();
+    getLocations();
   }, []);
 
   return (
