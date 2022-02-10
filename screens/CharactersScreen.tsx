@@ -4,7 +4,9 @@ import {
   FlatList,
   Image,
   TextInput,
+  ScrollView,
   Pressable,
+  StatusBar,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 
@@ -36,134 +38,139 @@ export default function CharactersScreen({
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.greetings}>
-          <View style={styles.eyebrow}>
-            <FontAwesome
-              name="child"
-              size={15}
-              color={Colors.paletteOne.purple}
-            />
-            <Text style={styles.eyebrowTitle}>Characters</Text>
-          </View>
-          <View style={styles.seeAllContainer}>
-            <Text style={styles.see}>See,</Text>
-            <Text style={styles.all}>All here!</Text>
-          </View>
-        </View>
-        <View style={styles.profilePicture}>
-          <FontAwesome name="user" size={20} color="white" />
-        </View>
-      </View>
-
-      <View style={styles.search}>
-        <TextInput
-          style={styles.input}
-          onChangeText={() => {}}
-          value={""}
-          placeholder="Search Characters"
-          keyboardType="web-search"
-          placeholderTextColor={Colors.whiteOpacity}
-        />
-        <View style={styles.filters}>
-          <FontAwesome name="sliders" size={30} color="white" />
-        </View>
-      </View>
-
-      <View style={styles.menu}>
-        <FlatList
-          data={locations}
-          renderItem={({ item }) => (
-            <View style={styles.menuList}>
-              <Pressable
-                onPress={() => {
-                  setSelected(item.id === selected ? 0 : item.id);
-                }}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                })}
-              >
-                <Text
-                  numberOfLines={2}
-                  style={[
-                    styles.title,
-                    item.id === selected ? styles.titleSelected : {},
-                  ]}
-                >
-                  {item.name}
-                </Text>
-              </Pressable>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.header}>
+          <View style={styles.greetings}>
+            <View style={styles.eyebrow}>
+              <FontAwesome
+                name="child"
+                size={15}
+                color={Colors.paletteOne.purple}
+              />
+              <Text style={styles.eyebrowTitle}>Characters</Text>
             </View>
-          )}
-          keyExtractor={(item) => item.id.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
+            <View style={styles.seeAllContainer}>
+              <Text style={styles.see}>See,</Text>
+              <Text style={styles.all}>All here!</Text>
+            </View>
+          </View>
+          <View style={styles.profilePicture}>
+            <FontAwesome name="user" size={20} color="white" />
+          </View>
+        </View>
 
-      <View style={styles.containerCharacters}>
-        <FlatList
-          data={characters}
-          renderItem={({ item }) => (
-            <View style={styles.listItems}>
-              <Pressable
-                onPress={() => setSaved(!saved)}
-                style={{
-                  ...styles.bookmark,
-                  opacity: saved ? 1 : 0.7,
-                }}
-              >
-                <FontAwesome
-                  name={saved ? "bookmark" : "bookmark-o"}
-                  size={20}
-                  color="white"
-                />
-              </Pressable>
-              <View style={styles.containerStatus}>
-                <Text
+        <View style={styles.search}>
+          <TextInput
+            style={styles.input}
+            onChangeText={() => {}}
+            value={""}
+            placeholder="Search Characters"
+            keyboardType="web-search"
+            placeholderTextColor={Colors.whiteOpacity}
+          />
+          <View style={styles.filters}>
+            <FontAwesome name="sliders" size={30} color="white" />
+          </View>
+        </View>
+
+        <View style={styles.menu}>
+          <FlatList
+            data={locations}
+            renderItem={({ item }) => (
+              <View style={styles.menuList}>
+                <Pressable
+                  onPress={() => {
+                    setSelected(item.id === selected ? 0 : item.id);
+                  }}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.5 : 1,
+                  })}
+                >
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.title,
+                      item.id === selected ? styles.titleSelected : {},
+                    ]}
+                  >
+                    {item.name}
+                  </Text>
+                </Pressable>
+              </View>
+            )}
+            keyExtractor={(item) => item.id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+
+        <View style={styles.containerCharacters}>
+          <FlatList
+            data={characters}
+            renderItem={({ item }) => (
+              <View style={styles.listItems}>
+                <Pressable
+                  onPress={() => setSaved(!saved)}
                   style={{
-                    ...styles.status,
-                    color: item.status === "Alive" ? "green" : "red",
+                    ...styles.bookmark,
+                    opacity: saved ? 1 : 0.7,
                   }}
                 >
-                  {item.status}
-                </Text>
-              </View>
-              <View style={styles.containerImg}>
-                <Image style={styles.img} source={{ uri: item.image || "" }} />
-              </View>
-              <View
-                style={{
-                  ...styles.description,
-                  borderColor:
-                    item.gender === "Female"
-                      ? Colors.paletteOne.pink
-                      : Colors.paletteOne.lightNavy,
-                }}
-              >
-                <Text numberOfLines={1} style={styles.name}>
-                  {item.name}
-                </Text>
-                <View style={styles.containerSpeciesGender}>
-                  <Text style={styles.species}>{item.species}, </Text>
-                  <Text style={styles.gender}>{item.gender}</Text>
-                </View>
-                <View style={styles.containerLocation}>
-                  <Text numberOfLines={1} style={styles.location}>
-                    From: {item.origin.name}
-                  </Text>
-                  <Text numberOfLines={1} style={styles.location}>
-                    Location: {item.location.name}
+                  <FontAwesome
+                    name={saved ? "bookmark" : "bookmark-o"}
+                    size={20}
+                    color="white"
+                  />
+                </Pressable>
+                <View style={styles.containerStatus}>
+                  <Text
+                    style={{
+                      ...styles.status,
+                      color: item.status === "Alive" ? "green" : "red",
+                    }}
+                  >
+                    {item.status}
                   </Text>
                 </View>
+                <View style={styles.containerImg}>
+                  <Image
+                    style={styles.img}
+                    source={{ uri: item.image || "" }}
+                  />
+                </View>
+                <View
+                  style={{
+                    ...styles.description,
+                    borderColor:
+                      item.gender === "Female"
+                        ? Colors.paletteOne.pink
+                        : Colors.paletteOne.lightNavy,
+                  }}
+                >
+                  <Text numberOfLines={1} style={styles.name}>
+                    {item.name}
+                  </Text>
+                  <View style={styles.containerSpeciesGender}>
+                    <Text style={styles.species}>{item.species}, </Text>
+                    <Text style={styles.gender}>{item.gender}</Text>
+                  </View>
+                  <View style={styles.containerLocation}>
+                    <Text numberOfLines={1} style={styles.location}>
+                      From: {item.origin.name}
+                    </Text>
+                    <Text numberOfLines={1} style={styles.location}>
+                      Location: {item.location.name}
+                    </Text>
+                  </View>
+                </View>
               </View>
-            </View>
-          )}
-          keyExtractor={(item) => item.id.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
+            )}
+            keyExtractor={(item) => item.id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -171,20 +178,21 @@ export default function CharactersScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
+    paddingTop: StatusBar.currentHeight,
+  },
+  scrollView: {
     backgroundColor: Colors.paletteOne.navy,
-    padding: 10,
+    height: "80%",
   },
   header: {
     backgroundColor: Colors.transparent,
-    height: "25%",
+    height: 180,
     width: "100%",
-    padding: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
     flexDirection: "row",
     justifyContent: "space-between",
     paddingTop: 30,
-    marginBottom: 10,
   },
   greetings: {
     backgroundColor: Colors.transparent,
@@ -226,9 +234,10 @@ const styles = StyleSheet.create({
   },
   search: {
     backgroundColor: Colors.transparent,
-    height: "10%",
+    height: 80,
     width: "100%",
-    padding: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -258,9 +267,10 @@ const styles = StyleSheet.create({
   },
   menu: {
     backgroundColor: Colors.transparent,
-    height: "10%",
+    height: 50,
     width: "100%",
-    padding: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
     paddingRight: 0,
   },
   menuList: {
@@ -273,18 +283,17 @@ const styles = StyleSheet.create({
   },
   containerCharacters: {
     backgroundColor: Colors.transparent,
-    height: "55%",
+    height: 370,
     width: "100%",
-    padding: 5,
+    paddingVertical: 5,
     paddingRight: 0,
-    marginTop: 10,
   },
   listItems: {
     backgroundColor: Colors.transparent,
-    marginRight: 20,
     height: "80%",
     position: "relative",
     alignItems: "center",
+    marginLeft: 15,
   },
   bookmark: {
     position: "absolute",
@@ -383,11 +392,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.white,
     textAlign: "center",
-    margin: 2,
-    fontFamily: Fonts.robotoLight,
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   titleSelected: {
+    fontWeight: "600",
+    textDecorationStyle: "solid",
     borderBottomWidth: 2,
     borderColor: Colors.paletteOne.purple,
     borderBottomRightRadius: 200,
