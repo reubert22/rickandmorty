@@ -77,6 +77,7 @@ function BottomTabNavigator() {
     <BottomTab.Navigator
       initialRouteName="CharactersTab"
       screenOptions={{
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           borderRadius: 20,
           alignItems: "center",
