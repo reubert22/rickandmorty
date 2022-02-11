@@ -7,6 +7,7 @@ import {
   ScrollView,
   Pressable,
   StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 
@@ -16,25 +17,29 @@ import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import { useGetCharacters } from "../hooks/useGetCharacters";
 import { useGetLocation } from "../hooks/useGetLocation";
+import { usePagination } from "../hooks/usePagination";
 
 export default function CharactersScreen({
   navigation,
 }: RootTabScreenProps<"CharactersTab">) {
   const [selected, setSelected] = useState<number>(0);
   const [saved, setSaved] = useState(false);
-  const { characters, fetchCharacters } = useGetCharacters();
+  const { characters, info, fetchCharacters } = useGetCharacters();
   const { locations, fetchLocation } = useGetLocation();
+  const { page, increasePage } = usePagination();
 
-  const getCharacters = () =>
-    fetchCharacters("https://rickandmortyapi.com/api/character");
+  const getCharacters = (page: number) =>
+    fetchCharacters(
+      `https://rickandmortyapi.com/api/character?page=${page}&name=`
+    );
 
   const getLocations = () =>
     fetchLocation("https://rickandmortyapi.com/api/location");
 
   useEffect(() => {
-    getCharacters();
-    getLocations();
-  }, []);
+    getCharacters(page);
+    // getLocations();
+  }, [page]);
 
   return (
     <View style={styles.container}>
@@ -42,12 +47,12 @@ export default function CharactersScreen({
         <View style={styles.header}>
           <View style={styles.greetings}>
             <View style={styles.eyebrow}>
-              <FontAwesome
+              {/* <FontAwesome
                 name="child"
                 size={15}
                 color={Colors.paletteOne.purple}
-              />
-              <Text style={styles.eyebrowTitle}>Characters</Text>
+              /> */}
+              <Text style={styles.eyebrowTitle}>Rick and Morty</Text>
             </View>
             <View style={styles.seeAllContainer}>
               <Text style={styles.see}>See,</Text>
@@ -73,7 +78,7 @@ export default function CharactersScreen({
           </View>
         </View>
 
-        <View style={styles.menu}>
+        {/* <View style={styles.menu}>
           <FlatList
             data={locations}
             renderItem={({ item }) => (
@@ -102,11 +107,27 @@ export default function CharactersScreen({
             horizontal
             showsHorizontalScrollIndicator={false}
           />
-        </View>
+        </View> */}
+
+        {/* <View style={styles.eyebrow}>
+          <FontAwesome
+            name="child"
+            size={15}
+            color={Colors.paletteOne.purple}
+          />
+          <Text style={styles.eyebrowTitle}>Characters</Text>
+        </View> */}
 
         <View style={styles.containerCharacters}>
           <FlatList
             data={characters}
+            onEndReachedThreshold={0.1}
+            onEndReached={() => increasePage()}
+            ListFooterComponent={() => (
+              <View style={styles.characterFooter}>
+                <ActivityIndicator color={Colors.paletteOne.purple} />
+              </View>
+            )}
             renderItem={({ item }) => (
               <View style={styles.listItems}>
                 <Pressable
@@ -283,10 +304,17 @@ const styles = StyleSheet.create({
   },
   containerCharacters: {
     backgroundColor: Colors.transparent,
-    height: 370,
+    height: 450,
     width: "100%",
     paddingVertical: 5,
     paddingRight: 0,
+  },
+  characterFooter: {
+    backgroundColor: Colors.transparent,
+    width: 100,
+    height: 350,
+    alignItems: "center",
+    justifyContent: "center",
   },
   listItems: {
     backgroundColor: Colors.transparent,
@@ -383,7 +411,7 @@ const styles = StyleSheet.create({
   eyebrowTitle: {
     fontSize: 14,
     color: Colors.whiteOpacity,
-    marginLeft: 10,
+    // marginLeft: 10,
     fontFamily: Fonts.shadowsInto,
     letterSpacing: 1,
     lineHeight: 20,

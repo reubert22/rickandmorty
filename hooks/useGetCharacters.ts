@@ -3,7 +3,8 @@ import axios from "axios";
 import { CharactersType } from "../types/Characters";
 
 export const useGetCharacters = () => {
-  const [characters, getCharacters] = useState<CharactersType[]>([]);
+  const [characters, setCharacters] = useState<CharactersType[]>([]);
+  const [info, setInfo] = useState();
   const [url, fetchCharacters] = useState("");
   const [isLoadingCharacters, setIsLoadingCharacters] = useState(false);
   const [isErrorCharacters, setIsErrorCharacters] = useState(false);
@@ -16,7 +17,8 @@ export const useGetCharacters = () => {
       try {
         const response = await axios(url);
 
-        getCharacters(response.data.results);
+        setCharacters([...characters, ...response.data.results]);
+        setInfo(response.data.info);
       } catch (error) {
         setIsErrorCharacters(true);
       }
@@ -29,6 +31,7 @@ export const useGetCharacters = () => {
 
   return {
     characters,
+    info,
     isLoadingCharacters,
     isErrorCharacters,
     fetchCharacters,
